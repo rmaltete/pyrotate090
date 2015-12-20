@@ -1,0 +1,52 @@
+shell command examples:
+
+Windows bat file for merging one day log files from 5 nodes of app server,
+executed on 5-th server today (081026 02:30) for yesterday's (081025) files
+
+
+1-st bat-file:
+
+for /F "usebackq" %%i IN (`dir /on /b d:\scripts\log\Sp0*.log`) DO copy \\searcher1\log\%%i + \\searcher2\log\%%i + \\search3\log\%%i + \\searcher4\log\%%i + d:\log\%%i \\archer\logs\%%i & exit
+rem   if we have two files like Sp081025.log and Sp081026.log
+rem   this bat-file copy five searcher's Sp081025.log to merged archer's Sp081025.log and
+rem   exit from bat-file (to skip processing of remain files)
+
+
+2-nd bat-file:
+
+rem merged file
+C:\Python25\python D:\utils\pyrotate\pyrotate.py D:\utils\pyrotate\sp_logs_all.conf
+rem individual file for this server
+C:\Python25\python D:\utils\pyrotate\pyrotate.py D:\utils\pyrotate\sp_logs.conf
+
+
+#sp_logs_all.conf
+#weekly arch of daily logs (given by arch name)
+config = {
+    'logfile':  '\\\\archer\\logs\\Sp%y%m%d.log',
+    'target':  '\\\\archer\\logs\\sp_%y%W',
+    'keeps': 1,
+    'compress': 'D:\\utils\\rar\\winrar.exe a -ep -s -ilog_errs.log',
+    'period':  'daily',
+    'priorfile': 1
+}
+
+#sp_logs.conf
+config = {
+    'logfile':  'D:/log/Sp%y%m%d.log',
+    'target':  'D:/log/sp_%y%W_SM5',
+    'keeps':    1,
+    'compress': 'D:\\utils\\rar\\winrar.exe a -ep -s -ilog_errs.log',
+    'period':   'daily',
+    'force':    0,
+    'priorfile': 1
+}
+
+for example,  arch sp0841 will contain files after weekend:
+Sp081020.log
+Sp081021.log
+Sp081022.log
+Sp081023.log
+Sp081024.log
+Sp081025.log
+Sp081026.log
